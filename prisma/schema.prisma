@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+//npx prisma migrate dev-1sql üretir 2-db tablosu oluşturur 3-typescript client üretir
+//Veritabanını kodla tanımlıyorsun ve Prisma senin yerine SQL + query kodlarını üretiyor.
+//burada kendi şeması var,modellerimizi burada açıklayacağız 
+
+
+//(Nest.js zaten node.js üzerinde çalışan bir framework yani node.js için prisma client demek nest.js içinde de aynı client ı kullanıyorsun demek.
+//nest.js ayrı bir runtime değil express//fasify üstünde node.js çalışıyor.)
+
+// prisma bana node.js içinde kullanacağım bir client üret.
+generator client {
+  provider = "prisma-client-js"
+}
+
+//"Hangi veritabanına bağlanacağım?"
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//Database’de User adında şöyle bir tablo olacak:
+//id                createdAt	               updatedAt
+model User {
+  id Int @id @default(autoincrement()) //Yeni kayıt eklenince id otomatik artsın.
+  createdAt DateTime @default(now()) //Kayıt oluşturulunca tarih otomatik olarak şu an olsun.
+  updatedAt DateTime @updatedAt //Kayıt her güncellendiğinde bu alan otomatik değişir.
+
+  email String
+  hash String
+
+  firstName String?// ? means optional (nullable)
+  lastName String?
+}
+
+//" Bookmark " " " " ":
+model Bookmark {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String
+  description String?
+  link String
+}
