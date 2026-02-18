@@ -8,7 +8,7 @@
 //Veritabanını kodla tanımlıyorsun ve Prisma senin yerine SQL + query kodlarını üretiyor.
 //burada kendi şeması var,modellerimizi burada açıklayacağız 
 
-
+//@@map () sadece db adıı değiştirmek için kullanılır 
 //(Nest.js zaten node.js üzerinde çalışan bir framework yani node.js için prisma client demek nest.js içinde de aynı client ı kullanıyorsun demek.
 //nest.js ayrı bir runtime değil express//fasify üstünde node.js çalışıyor.)
 
@@ -30,11 +30,15 @@ model User {
   createdAt DateTime @default(now()) //Kayıt oluşturulunca tarih otomatik olarak şu an olsun.
   updatedAt DateTime @updatedAt //Kayıt her güncellendiğinde bu alan otomatik değişir.
 
-  email String
+  email String @unique
   hash String
 
   firstName String?// ? means optional (nullable)
   lastName String?
+
+  bookmarks Bookmark[] //bir kullanıcının birden fazla bookmarkı olabilir 
+
+  @@map("users")
 }
 
 //" Bookmark " " " " ":
@@ -46,4 +50,9 @@ model Bookmark {
   title String
   description String?
   link String
+
+userId Int //Bookmark’ın hangi kullanıcıya ait olduğunu tutan foreign key alanıdır. bu kolon =users.id ile eşleşir
+user User @relation(fields: [userId], references: [id]) //Bu bookmark bir User’a bağlıdır ve bu ilişki bookmark içindeki userId → User.id üzerinden kurulur.
+//alanının adı //bağlandığın modelin adı
+  @@map("bookmarks") 
 }
