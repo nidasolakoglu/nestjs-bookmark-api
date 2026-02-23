@@ -7,10 +7,17 @@ import { AuthDto } from './dto';
 import * as argon from 'argon2'; //Argon2:şifreyi hashler,düz şifre saklamayı engeller,login sırasında doğrulama yapar
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { hash } from 'crypto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {} // NestJS bana PrismaService ver diyorsun ve NestJS senin yerine veriyor.buna Dependency Injection denir.
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {} // “Bu class çalışabilsin diye bana PrismaService ve JwtService lazım. Ben bunları kendim new ile oluşturmayacağım, Nest versin.”.buna Dependency Injection denir.
+  // private = class içinde kullan, dışarıya kapat yazmazsan this.prisma oluşmaz
 
   async signup(dto: AuthDto) {
     // async=Fonksiyonun içinde await kullanabilmeni sağlar.
@@ -67,7 +74,7 @@ export class AuthService {
     //IF USER DOES NOT EXIST THROW EXEPTION
     if (!user)
       throw new ForbiddenException(
-        'Credentials incorrect',
+        'Credentials incorrect 1',
       );
     //COMPARE PASSWORD
     const pwMatches = await argon.verify(
@@ -77,10 +84,36 @@ export class AuthService {
     //IF PASSWORD INCORRECT THROW EXCEPTION
     if (!pwMatches)
       throw new ForbiddenException(
-        'Credentials incorrect',
+        'Credentials incorrect 2',
       );
     //SEND BACK THE USER
     delete (user as any).hash;
-    return user;
+    return this.signToken(user.id, user.email);
   }
-}
+
+  async signToken( //bu func. sadece token üretir
+    userId: number, 
+    email: string,
+  )//:Promise<string> { //bu fonksiyon ileride bir string döndürcek
+    :Promise<{ access_token: string }> {
+    const payload = { //token'ın içine koyacağımız infolar
+      sub: userId,
+      email,
+    };
+    const secret = this.config.get('JWT_SECRET') //token'ı imzalarken kullanacağımız anahtarı al
+    
+     const token = await this.jwt.signAsync(
+      payload, 
+      {
+      expiresIn: '15m',
+      secret: secret,
+      }, //user 15 dk boyunca imzaladığımız tokenle iş yapabilir,15 dk sonra token will rejected
+    );      //payload'ı al,secretle imzala,15m,jwt üret(json web token)
+
+    return {
+      access_token: token,
+    }
+   }
+}; 
+      
+
