@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Post,
 } from '@nestjs/common'; //Controllerın service'yi çağırıyor olması lazım.İnternetten bir istek alacak service'yi call edecek,service methodu çalıştırıp sonuç döndürdükten sonra controllera gönderecek.Bu da browserda görünecek.
 
@@ -21,6 +23,7 @@ export class AuthController {
     return this.authService.signup(dto); //"Bu controller’ın içindeki authService’e git ve signup fonksiyonunu çalıştır."+this =Bu sınıfın içindeki değişkenlere veya fonksiyonlara erişmek için kullanılır.
   } //alınan veri service'ye gönderilir
 
+  @HttpCode(HttpStatus.OK)
   @Post('signin')
   signin(@Body() dto: AuthDto) {
     return this.authService.signin(dto);
