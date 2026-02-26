@@ -13,6 +13,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt')) //bu endpointe gelen herkes JWT göndermek zorunda AuthGuard('jwt'),JwtSTrategy tetikler ve devreye girer
   @Get('me')
   getMe(@Req() req: Request & { user?: any }) {
-    return 'user info';
+         return 'user info';
   }
 }
+ 
