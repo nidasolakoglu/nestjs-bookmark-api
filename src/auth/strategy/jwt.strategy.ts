@@ -8,7 +8,7 @@ import {
   Strategy,
 } from 'passport-jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UnauthorizedException } from '@nestjs/common';//yetkisiz hatası:HTTP 401 döner
+import { UnauthorizedException } from '@nestjs/common'; //yetkisiz hatası:HTTP 401 döner
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(
@@ -27,8 +27,8 @@ export class JwtStrategy extends PassportStrategy(
     super({
       //al bu ayarlarla çalış
       jwtFromRequest:
-      //Bearer = taşıyan kişi,Bu token’a sahip olan kullanıcıdır
-        ExtractJwt.fromAuthHeaderAsBearerToken(), //JWT’nin nereden alınacağını söyler 
+        //Bearer = taşıyan kişi,Bu token’a sahip olan kullanıcıdır
+        ExtractJwt.fromAuthHeaderAsBearerToken(), //JWT’nin nereden alınacağını söyler
       secretOrKey: secret, //JWT’nin imzasını doğrulamak için kullanılan gizli anahtar
     });
     //Authorization → header adı
@@ -41,17 +41,20 @@ export class JwtStrategy extends PassportStrategy(
     sub: number;
     email: string;
   }) {
-    const user = await this.prisma.user.findUnique({
-      where: {
-        id: payload.sub, 
-      }
-    })
+    const user =
+      await this.prisma.user.findUnique({
+        where: {
+          id: payload.sub,
+        },
+      });
     if (!user) {
-  throw new UnauthorizedException('User not found');
-}
-    //şifre hash'i dışarı sızdırmamak 
+      throw new UnauthorizedException(
+        'User not found',
+      );
+    }
+    //şifre hash'i dışarı sızdırmamak
     const { hash, ...result } = user; //destructuring yapılıyor yani yeni temiz bir obje oluşturuluyor->"user'dan hash'i çıkar kalanları bana ver"
     return user;
   }
-}//JWT=HEADER.PAYLOAD.SIGNATURE
-//payload=kullanıcı bilgileri 
+} //JWT=HEADER.PAYLOAD.SIGNATURE
+//payload=kullanıcı bilgileri

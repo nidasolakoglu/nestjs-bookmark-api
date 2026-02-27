@@ -20,7 +20,7 @@ generator client {
 //"Hangi veritabanına bağlanacağım?"
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") //git ve .env dosyasına bak ve bu değeri al
 }
 
 //Database’de User adında şöyle bir tablo olacak:

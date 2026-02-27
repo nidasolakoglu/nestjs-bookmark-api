@@ -91,29 +91,28 @@ export class AuthService {
     return this.signToken(user.id, user.email);
   }
 
-  async signToken( //bu func. sadece token üretir
-    userId: number, 
-    email: string,
-  )//:Promise<string> { //bu fonksiyon ileride bir string döndürcek
-    :Promise<{ access_token: string }> {
-    const payload = { //token'ın içine koyacağımız infolar
+  async signToken(
+    //bu func. sadece token üretir
+    userId: number,
+    email: string, //:Promise<string> { //bu fonksiyon ileride bir string döndürcek
+  ): Promise<{ access_token: string }> {
+    const payload = {
+      //token'ın içine koyacağımız infolar
       sub: userId,
       email,
     };
-    const secret = this.config.get('JWT_SECRET') //token'ı imzalarken kullanacağımız anahtarı al
-    
-     const token = await this.jwt.signAsync(
-      payload, 
+    const secret = this.config.get('JWT_SECRET'); //token'ı imzalarken kullanacağımız anahtarı al
+
+    const token = await this.jwt.signAsync(
+      payload,
       {
-      expiresIn: '15m',
-      secret: secret,
+        expiresIn: '15m',
+        secret: secret,
       }, //user 15 dk boyunca imzaladığımız tokenle iş yapabilir,15 dk sonra token will rejected
-    );      //payload'ı al,secretle imzala,15m,jwt üret(json web token)
+    ); //payload'ı al,secretle imzala,15m,jwt üret(json web token)
 
     return {
       access_token: token,
-    }
-   }
-}; 
-      
-
+    };
+  }
+}
