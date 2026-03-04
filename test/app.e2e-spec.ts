@@ -1,8 +1,9 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import * as pactum from 'pactum';
+import { AuthDto } from 'src/auth/dto';
 import { AppModule } from 'src/app.module';
-import { ValidationPipe } from '@nestjs/common'; 
+import { ValidationPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 //bir test grubu tanımlıyorum; describe = testleri gruplayan başlık
@@ -27,12 +28,16 @@ describe('App e2e', () => {
         // transform: true             ==true olursa;Gelen veriyi DTO tipine dönüştürür.
       }),
     );
-    await app.init();//app'i hazırlar nstjs içindeki her şeyi kurar ama dışarıdan erişemezsin
-    await app.listen(3333);//app'i çalıştır -> server başlatır yani artık http://localhost:3333
+    await app.init(); //app'i hazırlar nstjs içindeki her şeyi kurar ama dışarıdan erişemezsin
+    await app.listen(3333); //app'i çalıştır -> server başlatır yani artık http://localhost:3333
 
     let prisma: PrismaService;
     prisma = app.get(PrismaService);
     await prisma.cleanDb();
+    // Pactum'un request atacağı backend server adresini ayarlıyorum
+    pactum.request.setBaseUrl(
+      'http://localhost:3333',
+    );
   });
 
   afterAll(() => {
@@ -42,13 +47,83 @@ describe('App e2e', () => {
   //it.todo('should pass');
 
   //describe = “Bu testlerin konusu şu” demek
-  describe('Auth', () =>{
+  //Auth modülü ile ilgili testler burada olacak demek;signup endpointi test edeceğiz
+  describe('Auth', () => {
+    const dto: AuthDto = {
+      email: 'vlad@gmail.com',
+      password: '123',
+    };
     describe('Singup', () => {
-      it.todo('Should signup')
+      it('should throw if email is empty', () => {
+        return pactum
+          .spec() //bir bir request başlat
+          .post('/auth/signup') //ve bu req post request olacak
+          .withBody({
+            password: dto.password,
+          })
+          .expectStatus(400);
+      });
+      it('should throw if password is empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/signup')
+          .withBody({
+            email: dto.email,
+          })
+          .expectStatus(400);
+      });
+      it('should throw if no body provided', () => {
+        return pactum
+          .spec()
+          .post('/auth/signup')
+          .expectStatus(400);
+      });
+      it('Should signup', () => {
+        //signup için fake user verisi hazırlıyorum("birisi bu bilgilerle singup yapmaya çalışsın")
+
+        //API çağırıyorum ve bu endpointe POST request gönderiyorum.yani BE'ye gerçekten HTTP req atıyorum
+        return pactum
+          .spec()
+          .post('/auth/signup') //body gönderiyoum yani req body bu oluyor
+          .withBody(dto)
+          .expectStatus(201); //beklenen sonucu söylüyorum 201=created
+        //inspect() = HTTP request ve response'u terminalde gösterir
+      });
     });
 
     describe('Signin', () => {
-      it.todo('Should signin')
+      it('should throw if email is empty', () => {
+        return pactum
+          .spec() 
+          .post('/auth/signin')
+          .withBody({
+            password: dto.password,
+          })
+          .expectStatus(400);
+      });
+      it('should throw if password is empty', () => {
+        return pactum
+          .spec()
+          .post('/auth/signin')
+          .withBody({
+            email: dto.email,
+          })
+          .expectStatus(400);
+      });
+      it('should throw if no body provided', () => {
+        return pactum
+          .spec()
+          .post('/auth/signin')
+          .expectStatus(400);
+      });
+      it('Should signin', () => {
+        return pactum
+          .spec()
+          .post('/auth/signin')
+          .withBody(dto)
+          .expectStatus(200) //200=ok
+          .stores('userAt', 'access_token') //server'fan gelen response içindeki access_token değerini al ve userAt adıyla sakla 
+      });
     });
   });
 
@@ -59,16 +134,14 @@ describe('App e2e', () => {
   });
 
   describe('Bookmarks', () => {
-     describe('Create bookmarks', () => {});
-    
-     describe('Get bookmarks', () => {});
+    describe('Create bookmarks', () => {});
 
-     describe('Get bookmark by id', () => {});
+    describe('Get bookmarks', () => {});
 
-     describe('Edit bookmark', () => {});
-     
-     describe('Delete bookmark', () => {});
-    });
- 
+    describe('Get bookmark by id', () => {});
 
+    describe('Edit bookmark', () => {});
+
+    describe('Delete bookmark', () => {});
+  });
 });
