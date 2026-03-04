@@ -52,6 +52,7 @@ model Bookmark {
   link String
 
 userId Int //Bookmark’ın hangi kullanıcıya ait olduğunu tutan foreign key alanıdır. bu kolon =users.id ile eşleşir
+//// onDelete: Cascade → Örneğin User silinirse, ona bağlı tüm Post/Bookmark gibi veriler de otomatik silinir (orphan data oluşmaz)
 user User @relation(fields: [userId], references: [id]) //Bu bookmark bir User’a bağlıdır ve bu ilişki bookmark içindeki userId → User.id üzerinden kurulur.
 //alanının adı //bağlandığın modelin adı
   @@map("bookmarks") 

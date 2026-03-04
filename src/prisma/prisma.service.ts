@@ -15,9 +15,18 @@ export class PrismaService extends PrismaClient {
       datasources: {
         db: {
           url: config.get('DATABASE_URL'), //.env gibi konfigürasyon değerlerine erişmek için. “Veritabanına bağlanırken kullanacağın URL şu olsun: DATABASE_URL”
-         // url : env("DATABSE_URL")
-        }
-      }
+          // url : env("DATABSE_URL")
+        },
+      },
     }); //super üst sınıfın constructorını çalıştırır yani prismaclientın
+  }
+  //transaction:
+  // Ya ikisi birlikte başarılı olur
+  // Ya da biri hata verirse hiçbiri yapılmaz (rollback)
+  cleanDb() {
+    return this.$transaction([
+      this.bookmark.deleteMany(),
+      this.user.deleteMany(),
+    ]);
   }
 }

@@ -1,7 +1,9 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import * as pactum from 'pactum';
 import { AppModule } from 'src/app.module';
 import { ValidationPipe } from '@nestjs/common'; 
+import { PrismaService } from 'src/prisma/prisma.service';
 
 //bir test grubu tanımlıyorum; describe = testleri gruplayan başlık
 describe('App e2e', () => {
@@ -25,12 +27,48 @@ describe('App e2e', () => {
         // transform: true             ==true olursa;Gelen veriyi DTO tipine dönüştürür.
       }),
     );
-    await app.init();
+    await app.init();//app'i hazırlar nstjs içindeki her şeyi kurar ama dışarıdan erişemezsin
+    await app.listen(3333);//app'i çalıştır -> server başlatır yani artık http://localhost:3333
+
+    let prisma: PrismaService;
+    prisma = app.get(PrismaService);
+    await prisma.cleanDb();
   });
 
   afterAll(() => {
     app.close();
   });
   //it.todo = “bu test daha yazılacak” işaretidir
-  it.todo('should pass');
+  //it.todo('should pass');
+
+  //describe = “Bu testlerin konusu şu” demek
+  describe('Auth', () =>{
+    describe('Singup', () => {
+      it.todo('Should signup')
+    });
+
+    describe('Signin', () => {
+      it.todo('Should signin')
+    });
+  });
+
+  describe('User', () => {
+    describe('Get me', () => {});
+
+    describe('Edit user', () => {});
+  });
+
+  describe('Bookmarks', () => {
+     describe('Create bookmarks', () => {});
+    
+     describe('Get bookmarks', () => {});
+
+     describe('Get bookmark by id', () => {});
+
+     describe('Edit bookmark', () => {});
+     
+     describe('Delete bookmark', () => {});
+    });
+ 
+
 });
