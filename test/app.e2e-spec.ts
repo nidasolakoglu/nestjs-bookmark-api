@@ -5,6 +5,7 @@ import { AuthDto } from 'src/auth/dto';
 import { AppModule } from 'src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { EditUserDto } from '../src/user/dto';
 
 //bir test grubu tanımlıyorum; describe = testleri gruplayan başlık
 describe('App e2e', () => {
@@ -128,9 +129,35 @@ describe('App e2e', () => {
   });
 
   describe('User', () => {
-    describe('Get me', () => {});
+    describe('Get me', () => {
+      it('should get current user', () => {
+        return pactum
+          .spec()
+          .get('/users/me')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .expectStatus(200);
+      });
+    });
 
-    describe('Edit user', () => {});
+    describe('Edit user', () => {
+      it('should edit user', () => {
+        const dto: EditUserDto = {
+          firstName: 'Vladimir',
+          email: 'vlad@codewithvlad.com',
+        };
+        return pactum
+          .spec()
+          .patch('/users')
+          .withHeaders({
+            Authorization: 'Bearer $S{userAt}',
+          })
+          .withBody(dto)
+          .expectStatus(200)
+          .expectBodyContains(dto.firstName)
+          .expectBodyContains(dto.email);
+      });
   });
 
   describe('Bookmarks', () => {
@@ -145,3 +172,4 @@ describe('App e2e', () => {
     describe('Delete bookmark', () => {});
   });
 });
+})
