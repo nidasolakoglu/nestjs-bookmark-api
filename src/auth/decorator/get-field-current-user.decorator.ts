@@ -1,11 +1,13 @@
-import type { from } from 'rxjs';
-import { createParamDecorator, ExecutionContext,UnauthorizedException,BadRequestException } from '@nestjs/common';
-import { use } from 'passport';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { UserField } from './user-field.enum';
 
-
 export const GetFieldOfCurrentUser =
-  createParamDecorator(
+  createParamDecorator<UserField>(
     (
       userField: UserField,
       executionContext: ExecutionContext,
