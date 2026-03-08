@@ -106,7 +106,7 @@ export class BookmarkController {
     );
   }
 
-  @Delete('id')
+  @Delete(':id')
   deleteBookmarkById(
     //request.user.id alınır,silme işlemi yapan kullanıcının kim olduğu berirlenir
     @GetFieldOfCurrentUser(UserField.ID)
