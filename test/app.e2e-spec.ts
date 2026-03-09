@@ -124,6 +124,7 @@ describe('App e2e', () => {
           .spec()
           .post('/auth/signin')
           .withBody(dto)
+          .inspect()
           .expectStatus(200) //200=ok
           .stores('userAt', 'access_token'); //server'fan gelen response içindeki access_token değerini al ve userAt adıyla sakla
       });
@@ -139,6 +140,7 @@ describe('App e2e', () => {
           .withHeaders({
             Authorization: 'Bearer $S{userAt}',
           })
+          .inspect()
           .expectStatus(200);
       });
     });
@@ -156,6 +158,7 @@ describe('App e2e', () => {
             Authorization: 'Bearer $S{userAt}',
           })
           .withBody(dto)
+          .inspect()
           .expectStatus(200)
           .expectBodyContains(dto.firstName)
           .expectBodyContains(dto.email);

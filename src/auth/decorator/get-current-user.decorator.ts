@@ -7,8 +7,13 @@ import {
 export const GetCurrentUser =
   createParamDecorator(
     (
+      data: unknown,
       executionContext: ExecutionContext,
     ) => {
+      console.log(
+        'BANA BAKIN EXEC CONTEXTI BASICAM',
+      );
+      console.log(executionContext);
       const request = executionContext
         .switchToHttp()
         .getRequest();
@@ -18,7 +23,7 @@ export const GetCurrentUser =
         throw new UnauthorizedException(
           'Current user was not found in request.',
         );
-      } 
-       return user;
+      }
+      return user;
     },
   );
